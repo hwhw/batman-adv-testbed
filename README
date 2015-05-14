@@ -1,18 +1,8 @@
 This will build a ready-to-run kernel plus initramfs (included into kernel image).
 
-* adapt config if needed
 * run prepare.sh
 * run build.sh
 
 that's it.
 
 A wrapper script for QEmu to run the result is included in run.sh
-
-You need a proper development environment, including
-* gcc suite
-* make
-* git
-* tar, xz
-* probably tons of other stuff.
-
-Kernel is built with the host compiler for now. That's likely to change to the toolchain used by buildroot in the future. Maybe.
