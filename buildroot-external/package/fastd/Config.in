@@ -1,0 +1,21 @@
+config BR2_PACKAGE_FASTD
+	bool "fastd"
+    select BR2_PACKAGE_JSON_C
+    select BR2_PACKAGE_LIBUECC
+    select BR2_PACKAGE_LIBSODIUM
+	help
+	  Fast and Secure Tunnelling Daemon
+
+	  http://git.universe-factory.net/fastd
+
+if BR2_PACKAGE_FASTD
+
+config BR2_PACKAGE_FASTD_WITH_OPENSSL
+        bool "build fastd with openssl"
+        select BR2_PACKAGE_OPENSSL
+        help
+          link with the OpenSSL which can speed up AES crypto by
+          some orders of magnitude
+
+endif
+

@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LIBSODIUM
+	bool "libsodium"
+	help
+	  A high-security, cross-platform, easy-to-use crypto library
+
+	  https://download.libsodium.org/doc/
+

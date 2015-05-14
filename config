@@ -1,7 +1,0 @@
-
-LINUX_VERSION=4.0.3
-LINUX_URL=https://www.kernel.org/pub/linux/kernel/v4.x/linux-$LINUX_VERSION.tar.xz
-LINUX_CONFIG=linux
-
-MAKE_OPTS=-j4
-

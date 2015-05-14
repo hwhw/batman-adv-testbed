@@ -1,0 +1,8 @@
+config BR2_PACKAGE_ALFRED
+	bool "alfred"
+	select BR2_PACKAGE_LIBCAP
+	help
+	  Alfred is the Almighty Lightweight Fact Remote Exchange Daemon
+
+	  http://www.open-mesh.org/projects/alfred
+

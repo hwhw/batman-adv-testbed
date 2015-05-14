@@ -1,0 +1,6 @@
+source "$BR2_EXTERNAL/package/batman-adv-legacy/Config.in"
+source "$BR2_EXTERNAL/package/batctl-legacy/Config.in"
+source "$BR2_EXTERNAL/package/alfred/Config.in"
+source "$BR2_EXTERNAL/package/fastd/Config.in"
+source "$BR2_EXTERNAL/package/libuecc/Config.in"
+source "$BR2_EXTERNAL/package/libsodium/Config.in"
