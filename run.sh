@@ -27,11 +27,11 @@ exec qemu-system-x86_64 \
     -m ${MEM:=64} \
     -nographic \
     -nodefaults \
-    -enable-kvm \
+    -enable-kvm -cpu host \
     -kernel ${KERNEL:=bzImage} \
     -append "$FLAGS" \
     -drive file=${ROOTDEV:=rootfs.squashfs},if=virtio,format=raw,readonly \
-    -object rng-random,filename=/dev/random,id=rng0 \
+    -device virtio-rng-pci \
     ${OVERLAY:+-virtfs local,path="$OVERLAY",security_model=none,mount_tag=overlay} \
     -serial ${SERIAL:-telnet:localhost:$((55000+${ID:=1})),server,nowait} \
     -balloon virtio \
