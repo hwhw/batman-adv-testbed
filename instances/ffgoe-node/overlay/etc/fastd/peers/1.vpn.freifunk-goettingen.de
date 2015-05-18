@@ -1,0 +1,2 @@
+key "550af47507836d6684bddf0299c720a9a4ac08e62e53b23765d6d44c97f6ff8d";
+remote ipv4 "1.vpn.freifunk-goettingen.de" port 12345;

@@ -1,0 +1,12 @@
+#!/bin/sh
+case "$1" in
+  start)
+        source /proc/cmdline &&
+            [ -n "$bat_rootkey" ] &&
+            mkdir -p /root/.ssh && chmod 0700 /root/.ssh &&
+            echo "$bat_rootkey" | sed 's/,/ /' > /root/.ssh/authorized_keys &&
+            chmod 0600 /root/.ssh/authorized_keys
+        ;;
+esac
+
+exit $?

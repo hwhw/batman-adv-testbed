@@ -1,0 +1,45 @@
+#!/bin/sh
+
+case "$1" in
+  start)
+        echo -n "Starting fastd: "
+        source /proc/cmdline
+        if [ -z "$fastd_secret" ]; then
+            /usr/bin/fastd --generate-key > /etc/fastd/key.txt
+            fastd_secret=$(awk '/Secret:/ {print $2}' /etc/fastd/key.txt)
+        fi
+        if egrep "^flags.* aes" /proc/cpuinfo > /dev/null; then
+            METHOD="aes128-gcm"
+        else
+            METHOD="salsa2012+umac"
+        fi
+        echo "
+log to syslog level info;
+interface \"mesh-vpn\";
+method \"$METHOD\";
+bind 0.0.0.0;
+secret \"$fastd_secret\";
+mtu 1406;
+status socket \"/var/run/fastd.socket\";
+#user \"nobody\";
+include peers from \"/etc/fastd/peers\";
+on up \"/etc/fastd/up.sh\";" > /etc/fastd/fastd.conf
+        umask 077
+        start-stop-daemon -S -b -q -p /var/run/fastd.pid \
+            --exec /usr/bin/fastd -- -c /etc/fastd/fastd.conf
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  stop)
+        echo -n "Stopping fastd: "
+        start-stop-daemon -K -q -p /var/run/fastd.pid
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  restart|reload)
+        start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

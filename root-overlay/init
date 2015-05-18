@@ -1,0 +1,34 @@
+#!/bin/sh
+exec 0</dev/console
+exec 1>/dev/console
+exec 2>/dev/console
+
+mount -t proc proc /proc
+mount -t tmpfs tmpfs /tmp
+
+CHROOT_PATH="/tmp/unionfs"
+mkdir -p $CHROOT_PATH/rootfs
+mkdir -p $CHROOT_PATH/overlayfs
+mkdir -p $CHROOT_PATH/rw
+mkdir -p $CHROOT_PATH/work
+mount -t 9p -o trans=virtio,version=9p2000.L overlay $CHROOT_PATH/overlayfs
+mount --bind / $CHROOT_PATH/rootfs
+mkdir -p /tmp/union
+
+if grep "overlay" /proc/filesystems; then
+    mount -t overlay -o lowerdir=$CHROOT_PATH/overlayfs:$CHROOT_PATH/rootfs,upperdir=$CHROOT_PATH/rw,workdir=$CHROOT_PATH/work overlay /tmp/union
+else
+    /usr/bin/unionfs -o allow_other,use_ino,suid,dev,nonempty,cow,chroot=$CHROOT_PATH,max_files=32768 /rw=RW:/overlayfs=RO:/rootfs=RO /tmp/union
+fi
+
+mount -t proc proc /tmp/union/proc
+mount -t devtmpfs devtmpfs /tmp/union/dev
+cd /tmp/union
+
+mkdir oldroot
+pivot_root . oldroot
+umount oldroot/proc
+umount oldroot/dev
+
+exec /sbin/init $*
+

@@ -1,0 +1,23 @@
+#!/bin/sh
+case "$1" in
+  start)
+        source /proc/cmdline && (
+            if [ -z "$bat_hostname" ]; then
+                bat_hostname="testbed-$bat_id"
+            fi
+            hostname $bat_hostname
+            echo "127.0.0.1 localhost $bat_hostname" > /etc/hosts
+            echo "::1 localhost $bat_hostname" >> /etc/hosts
+        )
+        ;;
+  stop)
+        ;;
+  restart|reload)
+        start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
