@@ -1,0 +1,26 @@
+#!/bin/sh
+
+case "$1" in
+  start)
+        echo -n "Starting crond: "
+        umask 077
+        start-stop-daemon -S -b -q -p /var/run/crond.pid \
+            --exec /usr/sbin/crond -- -f
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ls -1 /etc/crontabs | while read u; do crontab -u $u /etc/crontabs/$u; done
+        ;;
+  stop)
+        echo -n "Stopping crond: "
+        start-stop-daemon -K -q -p /var/run/crond.pid
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  restart|reload)
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

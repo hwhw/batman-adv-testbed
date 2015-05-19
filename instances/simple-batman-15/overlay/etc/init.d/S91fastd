@@ -1,0 +1,52 @@
+#!/bin/sh
+
+case "$1" in
+  start)
+        echo -n "Starting fastd: "
+        source /proc/cmdline
+        if [ -z "$fastd_secret" ]; then
+            /usr/bin/fastd --generate-key > /etc/fastd/key.txt
+            fastd_secret=$(awk '/Secret:/ {print $2}' /etc/fastd/key.txt)
+        fi
+        METHOD="null"
+        if [ -z "$fastd_peers" ]; then
+            VERIFY="on verify \"true\";"
+            echo "key \"a2822c632f9bdf990d34d612341a2b564bb4785742e9780ca185393034c8559c\";" > /etc/fastd/peers/dummy
+        fi
+        if [ -n "$fastd_limit" ]; then
+            LIMIT="peer limit $fastd_limit;"
+        fi
+        echo "
+mode tap;
+log to syslog level info;
+interface \"mesh-vpn\";
+method \"$METHOD\";
+bind 0.0.0.0:12345;
+secret \"$fastd_secret\";
+mtu 1406;
+status socket \"/var/run/fastd.socket\";
+#user \"nobody\";
+include peers from \"/etc/fastd/peers\";
+$VERIFY
+$LIMIT
+on up \"/etc/fastd/up.sh\";" > /etc/fastd/fastd.conf
+        umask 077
+        echo -n $fastd_peers|awk 'BEGIN{RS=",";FS="@"}{print "key \""$1"\";\nremote "$2" \""$3"\" port "$4";" > "/etc/fastd/peers/"$3".conf" }'
+        start-stop-daemon -S -b -q -p /var/run/fastd.pid \
+            --exec /usr/bin/fastd -- -c /etc/fastd/fastd.conf
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  stop)
+        echo -n "Stopping fastd: "
+        start-stop-daemon -K -q -p /var/run/fastd.pid
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  restart|reload)
+        start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

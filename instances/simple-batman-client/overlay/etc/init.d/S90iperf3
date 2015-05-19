@@ -1,0 +1,25 @@
+#!/bin/sh
+IPERF3_ARGS="-s -p 10003"
+
+case "$1" in
+  start)
+        echo -n "Starting iperf3 server: "
+        umask 077
+        start-stop-daemon -S -b -q -p /var/run/iperf3.pid \
+            --exec /usr/bin/iperf3 -- $IPERF3_ARGS
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  stop)
+        echo -n "Stopping iperf3 server: "
+        start-stop-daemon -K -q -p /var/run/iperf3.pid
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  restart|reload)
+        start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
